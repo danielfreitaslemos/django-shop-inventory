@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Scanner Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
+        .container { max-width: 500px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input[type="text"] { width: 70%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 15px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .result-box { margin-top: 25px; padding: 15px; border-left: 5px solid #007bff; background: #e9f3ff; }
+    </style>
+</head>
+<body>
+
+    <!-- Simple CSS Grid layout to put Search on left and Cart on right -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1100px; margin: 40px auto;">
+
+        <!-- LEFT COLUMN: LOOKUP AND SCANNER -->
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: fit-content;">
+            <h2>🏪 Shop Product Lookup</h2>
+
+            <form method="GET" action="">
+                <input type="text" name="code" placeholder="Scan product code..." required autofocus style="width:65%; padding:10px; font-size:16px;">
+                <button type="submit" style="padding:10px 15px; font-size:16px; background-color:#28a745; color:white; border:none; border-radius:4px; cursor:pointer;">Search</button>
+            </form>
+
+            {% if product %}
+                <div style="margin-top: 25px; padding: 15px; border-left: 5px solid #007bff; background: #e9f3ff;">
+                    <h3>Product Found!</h3>
+                    <p><strong>Code:</strong> {{ product.product_code }}</p>
+                    <p><strong>Name:</strong> {{ product.name }}</p>
+                    <p><strong>Price:</strong> ${{ product.price }}</p>
+                    <p><strong>Stock:</strong> {{ product.stock_count }} units remaining</p>
+
+                    <!-- Changed Action to Add to Cart -->
+                    <form method="GET" action="">
+                        <input type="hidden" name="code" value="{{ product.product_code }}">
+                        {% if product.stock_count > 0 %}
+                            <button type="submit" name="add_to_cart" style="padding:10px 15px; background-color:#ffc107; color:black; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">🛒 Add to Cart</button>
+                        {% else %}
+                            <button type="button" style="padding:10px 15px; background-color:#6c757d; color:white; border:none; border-radius:4px; cursor:not-allowed;" disabled>❌ Out of Stock</button>
+                        {% endif %}
+                    </form>
+                </div>
+            {% elif request.GET.code %}
+                <p style="color: red; margin-top: 20px;">⚠️ Product code not found.</p>
+            {% endif %}
+        </div>
+
+        <!-- RIGHT COLUMN: LIVE BASKET / SHOPPING CART -->
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: fit-content;">
+            <h2>🧾 Current Session Basket</h2>
+
+            {% if cart %}
+                <ul style="list-style-type: none; padding-left: 0;">
+                    {% for item in cart %}
+                        <li style="padding: 10px 0; border-bottom: 1px id #eee; display: flex; justify-content: space-between;">
+                            <span>📦 {{ item.name }} <small style="color:#666;">({{ item.code }})</small></span>
+                            <strong>${{ item.price|floatformat:2 }}</strong>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <hr style="border: 0; border-top: 2px dashed #ccc; margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; margin-bottom: 20px;">
+                    <span>Total Due:</span>
+                    <span style="color: #28a745;">${{ cart_total|floatformat:2 }}</span>
+                </div>
+
+                <form method="GET" action="">
+                    <button type="submit" name="clear_cart" style="width: 100%; padding: 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Clear Ticket</button>
+                </form>
+            {% else %}
+                <p style="color: #666; font-style: italic;">No items scanned yet. Basket is empty.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+</body>
+
+</html>
