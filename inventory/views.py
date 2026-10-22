@@ -90,3 +90,20 @@ def manager_dashboard(request):
         'threshold': LOW_STOCK_THRESHOLD,
     }
     return render(request, 'shop/manager_dashboard.html', context)
+
+# EDIT VIEW
+def edit_product(request, product_id):
+    # Fetch the specific product using its unique database ID row number
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == "POST":
+        # Overwrite the old values with whatever the manager typed into the edit form
+        product.product_code = request.POST.get('product_code')
+        product.name = request.POST.get('name')
+        product.price = request.POST.get('price')
+        product.stock_count = request.POST.get('stock_count')
+
+        product.save() # <--- Saves the updated row back to SQLite
+        return redirect('manager_dashboard') # Send them back to the dashboard
+
+    return render(request, 'shop/edit_product.html', {'product': product})
