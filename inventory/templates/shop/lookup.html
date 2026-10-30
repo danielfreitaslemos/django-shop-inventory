@@ -1,82 +1,192 @@
-<!DOCTYPE html>
+{% load static %}
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Product Scanner Panel</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
-        .container { max-width: 500px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input[type="text"] { width: 70%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 15px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .result-box { margin-top: 25px; padding: 15px; border-left: 5px solid #007bff; background: #e9f3ff; }
-    </style>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cashier Register Scanner</title>
 
-    <!-- Simple CSS Grid layout to put Search on left and Cart on right -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1100px; margin: 40px auto;">
-
-        <!-- LEFT COLUMN: LOOKUP AND SCANNER -->
-        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: fit-content;">
-            <h2>🏪 Shop Product Lookup</h2>
-
-            <form method="GET" action="">
-                <input type="text" name="code" placeholder="Scan product code..." required autofocus style="width:65%; padding:10px; font-size:16px;">
-                <button type="submit" style="padding:10px 15px; font-size:16px; background-color:#28a745; color:white; border:none; border-radius:4px; cursor:pointer;">Search</button>
-            </form>
-
-            {% if product %}
-                <div style="margin-top: 25px; padding: 15px; border-left: 5px solid #007bff; background: #e9f3ff;">
-                    <h3>Product Found!</h3>
-                    <p><strong>Code:</strong> {{ product.product_code }}</p>
-                    <p><strong>Name:</strong> {{ product.name }}</p>
-                    <p><strong>Price:</strong> ${{ product.price }}</p>
-                    <p><strong>Stock:</strong> {{ product.stock_count }} units remaining</p>
-
-                    <!-- Changed Action to Add to Cart -->
-                    <form method="GET" action="">
-                        <input type="hidden" name="code" value="{{ product.product_code }}">
-                        {% if product.stock_count > 0 %}
-                            <button type="submit" name="add_to_cart" style="padding:10px 15px; background-color:#ffc107; color:black; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">🛒 Add to Cart</button>
-                        {% else %}
-                            <button type="button" style="padding:10px 15px; background-color:#6c757d; color:white; border:none; border-radius:4px; cursor:not-allowed;" disabled>❌ Out of Stock</button>
-                        {% endif %}
-                    </form>
+        <!-- Clean offline static asset link -->
+        <link rel="stylesheet" href="{% static 'inventory/css/bootstrap.min.css' %}">
+    </head>
+    <body class="bg-light">
+        <div class="container my-5">
+            <!-- Header Row -->
+            <div class="row mb-4">
+                <div
+                    class="col-12 d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm"
+                >
+                    <h2 class="m-0 text-primary">🏪 Shop Register Panel</h2>
+                    <a
+                        href="{% url 'manager_dashboard' %}"
+                        class="btn btn-outline-secondary"
+                        >📊 Manager Dashboard</a
+                    >
                 </div>
-            {% elif request.GET.code %}
-                <p style="color: red; margin-top: 20px;">⚠️ Product code not found.</p>
-            {% endif %}
-        </div>
+            </div>
 
-        <!-- RIGHT COLUMN: LIVE BASKET / SHOPPING CART -->
-        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: fit-content;">
-            <h2>🧾 Current Session Basket</h2>
+            <!-- Layout Grid System Grid Split -->
+            <div class="row g-4">
+                <!-- LEFT COLUMN: LOOKUP PANEL (Takes 7 of 12 columns) -->
+                <div class="col-md-7">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <h4 class="card-title mb-4 text-secondary">
+                                Product Scanner
+                            </h4>
 
-            {% if cart %}
-                <ul style="list-style-type: none; padding-left: 0;">
-                    {% for item in cart %}
-                        <li style="padding: 10px 0; border-bottom: 1px id #eee; display: flex; justify-content: space-between;">
-                            <span>📦 {{ item.name }} <small style="color:#666;">({{ item.code }})</small></span>
-                            <strong>${{ item.price|floatformat:2 }}</strong>
-                        </li>
-                    {% endfor %}
-                </ul>
-                <hr style="border: 0; border-top: 2px dashed #ccc; margin: 20px 0;">
-                <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: bold; margin-bottom: 20px;">
-                    <span>Total Due:</span>
-                    <span style="color: #28a745;">${{ cart_total|floatformat:2 }}</span>
+                            <form
+                                method="GET"
+                                action=""
+                                class="input-group mb-4"
+                            >
+                                <input
+                                    type="text"
+                                    name="code"
+                                    class="form-control form-control-lg"
+                                    placeholder="Scan or enter item code..."
+                                    required
+                                    autofocus
+                                />
+                                <button class="btn btn-primary" type="submit">
+                                    Search
+                                </button>
+                            </form>
+
+                            {% if product %}
+                            <div
+                                class="card bg-gradient border-start border-primary border-4 p-3 bg-light"
+                            >
+                                <h5 class="text-primary fw-bold">
+                                    Product Identified!
+                                </h5>
+                                <div class="mt-3">
+                                    <p class="mb-2">
+                                        <strong>Code:</strong>
+                                        <span class="badge bg-secondary"
+                                            >{{ product.product_code }}</span
+                                        >
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Name:</strong> {{ product.name }}
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Price:</strong>
+                                        <span class="text-success fw-bold">${{ product.price|floatformat:2 }}</span>
+                                    </p>
+                                    <p class="mb-3">
+                                        <strong>Stock:</strong>
+                                        {% if product.stock_count > 0 %}
+                                        <span class="text-success fw-bold"
+                                            >{{ product.stock_count }}
+                                            items</span
+                                        >
+                                        {% else %}
+                                        <span class="text-danger fw-bold"
+                                            >Out of stock!</span
+                                        >
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                <form method="GET" action="">
+                                    <input
+                                        type="hidden"
+                                        name="code"
+                                        value="{{ product.product_code }}"
+                                    />
+                                    {% if product.stock_count > 0 %}
+                                    <button
+                                        type="submit"
+                                        name="add_to_cart"
+                                        class="btn btn-warning w-100 fw-bold shadow-sm"
+                                    >
+                                        🛒 Add to Basket
+                                    </button>
+                                    {% else %}
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary w-100"
+                                        disabled
+                                    >
+                                        ❌ Out of Stock
+                                    </button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                            {% elif request.GET.code %}
+                            <div class="alert alert-danger" role="alert">
+                                ⚠️ Product code not found in backend registry.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
 
-                <form method="GET" action="">
-                    <button type="submit" name="clear_cart" style="width: 100%; padding: 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Clear Ticket</button>
-                </form>
-            {% else %}
-                <p style="color: #666; font-style: italic;">No items scanned yet. Basket is empty.</p>
-            {% endif %}
+                <!-- RIGHT COLUMN: SHOPPING CART RECEIPT (Takes 5 of 12 columns) -->
+                <div class="col-md-5">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h4 class="card-title mb-4 text-secondary">
+                                Current Receipt
+                            </h4>
+
+                            <div
+                                class="flex-grow-1 overflow-auto mb-3"
+                                style="max-height: 300px"
+                            >
+                                {% if cart %}
+                                <div class="list-group list-group-flush">
+                                    {% for item in cart %}
+                                    <div
+                                        class="list-group-item d-flex justify-content-between align-items-center px-0 py-3"
+                                    >
+                                        <div>
+                                            <h6 class="my-0">
+                                                {{ item.name }}
+                                            </h6>
+                                            <small class="text-muted"
+                                                >Code: {{ item.code }}</small
+                                            >
+                                        </div>
+                                        <!-- FIXED: Added missing curly braces down below -->
+                                        <span class="text-muted fw-bold">${{ item.price|floatformat:2 }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <p class="text-muted text-center my-5">
+                                    No items registered to this session card
+                                    yet.
+                                </p>
+                                {% endif %}
+                            </div>
+
+                            {% if cart %}
+                            <div class="border-top pt-3 mt-auto">
+                                <div
+                                    class="d-flex justify-content-between mb-3 align-items-center"
+                                >
+                                    <h5 class="m-0">Total Due:</h5>
+                                    <h3 class="m-0 text-success fw-bold">
+                                        ${{ cart_total|floatformat:2 }}
+                                    </h3>
+                                </div>
+                                <form method="GET" action="">
+                                    <button
+                                        type="submit"
+                                        name="clear_cart"
+                                        class="btn btn-danger w-100 py-2"
+                                    >
+                                        Clear Ticket
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-    </div>
-
-</body>
-
+    </body>
 </html>
