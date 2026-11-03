@@ -12,10 +12,10 @@ def product_lookup(request):
         request.session["cart"] = []
 
     if query:
-        product = get_object_or_404(Product, product_code=query)
+        product = Product.objects.filter(product_code=query).first()
 
         # 2. Check if the user clicked "Add to Cart"
-        if "add_to_cart" in request.GET:
+        if product and "add_to_cart" in request.GET:
             if product.stock_count > 0:
                 # Deduct 1 from database stock
                 product.stock_count -= 1

@@ -115,9 +115,11 @@
                                 </form>
                             </div>
                             {% elif request.GET.code %}
-                            <div class="alert alert-danger" role="alert">
-                                ⚠️ Product code not found in backend registry.
-                            </div>
+                                <!-- This alert banner triggers safely if a code was searched but returned None -->
+                                <div class="alert alert-danger border-start border-danger border-4 shadow-sm" role="alert">
+                                    <h5 class="alert-heading fw-bold">⚠️ Item Code Unrecognized</h5>
+                                    <p class="mb-0 text-muted small">The scanned barcode <code>{{ request.GET.code }}</code> is not registered in the database inventory index. Please verify the numbers or contact a store manager.</p>
+                                </div>
                             {% endif %}
                         </div>
                     </div>
