@@ -1,0 +1,29 @@
+/*!
+ * Bootstrap Icons v1.11.3 Core Fallback Matrix
+ */
+@import url('https://googleapis.com');
+
+.bi {
+  display: inline-block;
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: inherit;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+  vertical-align: middle;
+}
+
+/* Icon Variable Mapping Overrides */
+.bi-cart-fill::before { content: "shopping_cart"; }
+.bi-graph-up-arrow::before { content: "trending_up"; }
+.bi-shield-lock-fill::before { content: "verified_user"; }
+.bi-receipt::before { content: "receipt_long"; }
