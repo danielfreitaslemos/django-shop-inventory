@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard - Sales Audit Logs</title>
+    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container my-5" style="max-width: 1000px;">
+
+        <!-- Header Bar -->
+        <div class="row mb-4">
+            <div class="col-12 d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm">
+                <h2 class="m-0 text-success">📊 Sales Audit & Logs</h2>
+                <div>
+                    <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-secondary me-2">📋 Inventory Dashboard</a>
+                    <a href="{% url 'shop_home' %}" class="btn btn-primary">🏠 Home Hub</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Overview Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-3 bg-white text-center">
+                    <h6 class="text-muted text-uppercase small">Total Lifetime Revenue</h6>
+                    <h2 class="fw-bold text-success">${{ grand_total|floatformat:2 }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-3 bg-white text-center">
+                    <h6 class="text-muted text-uppercase small">Total Units Swiped</h6>
+                    <h2 class="fw-bold text-primary">{{ logs.count }} items sold</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Table -->
+        <div class="card border-0 shadow-sm p-4 bg-white">
+            <h4 class="text-secondary mb-3">Transaction History Index</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Item Code</th>
+                            <th>Product Name</th>
+                            <th>Qty</th>
+                            <th>Total Charged</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                            <tr>
+                                <td class="text-muted">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                <td><span class="badge bg-secondary">{{ log.product_code }}</span></td>
+                                <td class="fw-bold text-dark">{{ log.product_name }}</td>
+                                <td>x{{ log.quantity }}</td>
+                                <td class="text-success fw-bold">${{ log.total_price|floatformat:2 }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4 italic">No retail transactions processed through this station yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

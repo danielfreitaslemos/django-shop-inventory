@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Product
+from .models import Product, SaleLog
 
 
 def product_lookup(request):
@@ -20,6 +20,14 @@ def product_lookup(request):
                 # Deduct 1 from database stock
                 product.stock_count -= 1
                 product.save()
+
+                SaleLog.objects.create(
+                    product=product,
+                    product_code=product.product_code,
+                    product_name=product.name,
+                    quantity=1,
+                    total_price=product.price
+                )
 
                 # Copy current cart session data, modify it, and save it back
                 current_cart = request.session["cart"]
@@ -47,6 +55,19 @@ def product_lookup(request):
         "cart_total": cart_total,
     }
     return render(request, "shop/lookup.html", context)
+
+def sales_history(request):
+    # Fetch all logs, ordered by newest transaction first
+    logs = SaleLog.objects.all().order_by('-timestamp')
+
+    # Dynamically sum all historical store earnings!
+    grand_total_revenue = sum(log.total_price for log in logs)
+
+    context = {
+        'logs': logs,
+        'grand_total': grand_total_revenue
+    }
+    return render(request, 'shop/sales_history.html', context)
 
 
 def add_product(request):
