@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏪 Shop Management System</title>
+    <!-- Pulling your bulletproof local bootstrap asset file instantly -->
+    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center" style="min-height: 100vh;">
+
+    <div class="container py-5 text-center" style="max-width: 900px;">
+
+        <!-- Welcome Hero Banner -->
+        <div class="mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-2">🏪 Shop OS Hub</h1>
+            <p class="text-muted fs-5">Welcome to your central control dashboard. Select a workspace portal below to begin operations.</p>
+        </div>
+
+        <!-- 3-Column Workspace Matrix (Using Bootstrap 12-column grid rule) -->
+        <div class="row g-4 justify-content-center">
+
+            <!-- PORTAL 1: CASHIER MODULE (Takes 4 of 12 columns) -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 text-center p-4">
+                    <div class="fs-1 mb-2">🛒</div>
+                    <h4 class="fw-bold text-dark">Cashier Register</h4>
+                    <p class="text-muted small flex-grow-1">Scan item codes, read database records, check live prices, and track current customer baskets.</p>
+                    <a href="{% url 'product_lookup' %}" class="btn btn-primary w-100 mt-3 py-2 fw-bold">Open Register</a>
+                </div>
+            </div>
+
+            <!-- PORTAL 2: MANAGER PANEL (Takes 4 of 12 columns) -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 text-center p-4">
+                    <div class="fs-1 mb-2">📊</div>
+                    <h4 class="fw-bold text-dark">Manager Panel</h4>
+                    <p class="text-muted small flex-grow-1">Track system stock levels, catch critical low stock alert warnings, edit details, or drop items.</p>
+                    <a href="{% url 'manager_dashboard' %}" class="btn btn-success w-100 mt-3 py-2 fw-bold">Open Dashboard</a>
+                </div>
+            </div>
+
+            <!-- PORTAL 3: DJANGO BACK-OFFICE (Takes 4 of 12 columns) -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0 text-center p-4">
+                    <div class="fs-1 mb-2">🔐</div>
+                    <h4 class="fw-bold text-dark">Admin Database</h4>
+                    <p class="text-muted small flex-grow-1">Manage underlying secure frameworks, register user authentication accounts, and clear raw tables.</p>
+                    <a href="/admin/" target="_blank" class="btn btn-outline-secondary w-100 mt-3 py-2 fw-bold">Open Admin Back-office</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer signature -->
+        <div class="mt-5 pt-4 text-muted border-top border-2 border-white">
+            <small>System Engine Status: <span class="text-success fw-bold">● Operational</span> · Powered by Django & Arch Linux</small>
+        </div>
+    </div>
+
+</body>
+</html>

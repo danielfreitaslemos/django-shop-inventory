@@ -107,3 +107,6 @@ def edit_product(request, product_id):
         return redirect('manager_dashboard') # Send them back to the dashboard
 
     return render(request, 'shop/edit_product.html', {'product': product})
+
+def shop_home(request):
+    return render(request, 'shop/home.html')
