@@ -1,196 +1,120 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Cashier Register Scanner</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier Register Scanner</title>
 
-        <!-- Clean offline static asset link -->
-        <link rel="stylesheet" href="{% static 'inventory/css/bootstrap.min.css' %}">
-        <link href="{% static 'inventory/css/bootstrap-icons.css' %}" rel="stylesheet">
-        </head>
-    </head>
-    <body class="bg-light">
-        <div class="container my-5">
-            <!-- Header Row -->
-            <div class="row mb-4">
-                <div
-                    class="col-12 d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm"
-                >
-                    <h2 class="m-0 text-primary">🏪 Shop Register Panel</h2>
-                    <a
-                        href="{% url 'manager_dashboard' %}"
-                        class="btn btn-outline-secondary"
-                        >📊 Manager Dashboard</a
-                    >
-                </div>
+    <!-- Offline style matrices -->
+    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'inventory/css/bootstrap-icons.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <div class="container my-5">
+
+        <!-- Header row -->
+        <div class="row mb-4">
+            <div class="col-12 d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm">
+                <h2 class="m-0 text-primary"><i class="bi bi-cart-fill me-2"></i>Shop Register Panel</h2>
+                <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-graph-up-arrow me-1"></i> Manager Dashboard
+                </a>
             </div>
+        </div>
 
-            <!-- Layout Grid System Grid Split -->
-            <div class="row g-4">
-                <!-- LEFT COLUMN: LOOKUP PANEL (Takes 7 of 12 columns) -->
-                <div class="col-md-7">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body p-4">
-                            <h4 class="card-title mb-4 text-secondary">
-                                Product Scanner
-                            </h4>
+        <div class="row g-4">
 
-                            <form
-                                method="GET"
-                                action=""
-                                class="input-group mb-4"
-                            >
-                                <input
-                                    type="text"
-                                    name="code"
-                                    class="form-control form-control-lg"
-                                    placeholder="Scan or enter item code..."
-                                    required
-                                    autofocus
-                                />
-                                <button class="btn btn-primary" type="submit">
-                                    Search
-                                </button>
-                            </form>
+            <!-- LEFT COLUMN: LOOKUP MODULE (Takes 7 of 12 tracks) -->
+            <div class="col-md-7">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4 text-secondary">Product Scanner</h4>
 
-                            {% if product %}
-                            <div
-                                class="card bg-gradient border-start border-primary border-4 p-3 bg-light"
-                            >
-                                <h5 class="text-primary fw-bold">
-                                    Product Identified!
-                                </h5>
+                        <form method="GET" action="" class="input-group mb-4">
+                            <input type="text" name="code" class="form-control form-control-lg" placeholder="Scan or enter item code..." required autofocus>
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-search me-1"></i> Search</button>
+                        </form>
+
+                        {% if product %}
+                            <div class="card bg-gradient border-start border-primary border-4 p-3 bg-light">
+                                <h5 class="text-primary fw-bold">Product Identified!</h5>
                                 <div class="mt-3">
-                                    <p class="mb-2">
-                                        <strong>Code:</strong>
-                                        <span class="badge bg-secondary"
-                                            >{{ product.product_code }}</span
-                                        >
-                                    </p>
-                                    <p class="mb-2">
-                                        <strong>Name:</strong> {{ product.name }}
-                                    </p>
-                                    <p class="mb-2">
-                                        <strong>Price:</strong>
-                                        <span class="text-success fw-bold">${{ product.price|floatformat:2 }}</span>
-                                    </p>
-                                    <p class="mb-3">
-                                        <strong>Stock:</strong>
+                                    <p class="mb-2"><strong>Code:</strong> <span class="badge bg-secondary">{{ product.product_code }}</span></p>
+                                    <p class="mb-2"><strong>Name:</strong> {{ product.name }}</p>
+                                    <p class="mb-2"><strong>Price:</strong> <span class="text-success fw-bold">${{ product.price|floatformat:2 }}</span></p>
+                                    <p class="mb-3"><strong>Stock:</strong>
                                         {% if product.stock_count > 0 %}
-                                        <span class="text-success fw-bold"
-                                            >{{ product.stock_count }}
-                                            items</span
-                                        >
+                                            <span class="text-success fw-bold">{{ product.stock_count }} items</span>
                                         {% else %}
-                                        <span class="text-danger fw-bold"
-                                            >Out of stock!</span
-                                        >
+                                            <span class="text-danger fw-bold">Out of stock!</span>
                                         {% endif %}
                                     </p>
                                 </div>
 
                                 <form method="GET" action="">
-                                    <input
-                                        type="hidden"
-                                        name="code"
-                                        value="{{ product.product_code }}"
-                                    />
+                                    <input type="hidden" name="code" value="{{ product.product_code }}">
                                     {% if product.stock_count > 0 %}
-                                    <button
-                                        type="submit"
-                                        name="add_to_cart"
-                                        class="btn btn-warning w-100 fw-bold shadow-sm"
-                                    >
-                                        🛒 Add to Basket
-                                    </button>
+                                        <button type="submit" name="add_to_cart" class="btn btn-warning w-100 fw-bold shadow-sm">🛒 Add to Basket</button>
                                     {% else %}
-                                    <button
-                                        type="button"
-                                        class="btn btn-secondary w-100"
-                                        disabled
-                                    >
-                                        ❌ Out of Stock
-                                    </button>
+                                        <button type="button" class="btn btn-secondary w-100" disabled>❌ Out of Stock</button>
                                     {% endif %}
                                 </form>
                             </div>
-                            {% elif request.GET.code %}
-                                <!-- This alert banner triggers safely if a code was searched but returned None -->
-                                <div class="alert alert-danger border-start border-danger border-4 shadow-sm" role="alert">
-                                    <h5 class="alert-heading fw-bold">⚠️ Item Code Unrecognized</h5>
-                                    <p class="mb-0 text-muted small">The scanned barcode <code>{{ request.GET.code }}</code> is not registered in the database inventory index. Please verify the numbers or contact a store manager.</p>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RIGHT COLUMN: SHOPPING CART RECEIPT (Takes 5 of 12 columns) -->
-                <div class="col-md-5">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <h4 class="card-title mb-4 text-secondary">
-                                Current Receipt
-                            </h4>
-
-                            <div
-                                class="flex-grow-1 overflow-auto mb-3"
-                                style="max-height: 300px"
-                            >
-                                {% if cart %}
-                                <div class="list-group list-group-flush">
-                                    {% for item in cart %}
-                                    <div
-                                        class="list-group-item d-flex justify-content-between align-items-center px-0 py-3"
-                                    >
-                                        <div>
-                                            <h6 class="my-0">
-                                                {{ item.name }}
-                                            </h6>
-                                            <small class="text-muted"
-                                                >Code: {{ item.code }}</small
-                                            >
-                                        </div>
-                                        <!-- FIXED: Added missing curly braces down below -->
-                                        <span class="text-muted fw-bold">${{ item.price|floatformat:2 }}</span>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                                {% else %}
-                                <p class="text-muted text-center my-5">
-                                    No items registered to this session card
-                                    yet.
-                                </p>
-                                {% endif %}
+                        {% elif request.GET.code %}
+                            <div class="alert alert-danger border-start border-danger border-4 shadow-sm" role="alert">
+                                <h5 class="alert-heading fw-bold">⚠️ Item Code Unrecognized</h5>
+                                <p class="mb-0 text-muted small">The scanned barcode <code>{{ request.GET.code }}</code> is not registered in the database inventory index.</p>
                             </div>
-
-                            {% if cart %}
-                            <div class="border-top pt-3 mt-auto">
-                                <div
-                                    class="d-flex justify-content-between mb-3 align-items-center"
-                                >
-                                    <h5 class="m-0">Total Due:</h5>
-                                    <h3 class="m-0 text-success fw-bold">
-                                        ${{ cart_total|floatformat:2 }}
-                                    </h3>
-                                </div>
-                                <form method="GET" action="">
-                                    <button
-                                        type="submit"
-                                        name="clear_cart"
-                                        class="btn btn-danger w-100 py-2"
-                                    >
-                                        Clear Ticket
-                                    </button>
-                                </form>
-                            </div>
-                            {% endif %}
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
+
+            <!-- RIGHT COLUMN: LIVE BASKET TICKET (Takes 5 of 12 tracks) -->
+            <div class="col-md-5">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h4 class="card-title mb-4 text-secondary">Current Receipt</h4>
+
+                        <div class="flex-grow-1 overflow-auto mb-3" style="max-height: 300px;">
+                            {% if cart %}
+                                <div class="list-group list-group-flush">
+                                    {% for item in cart %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3">
+                                            <div>
+                                                <h6 class="my-0">{{ item.name }}</h6>
+                                                <small class="text-muted">Code: {{ item.code }}</small>
+                                            </div>
+                                            <span class="text-muted fw-bold">${{ item.price|floatformat:2 }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted text-center my-5">No items registered to this session card yet.</p>
+                            {% endif %}
+                        </div>
+
+                        {% if cart %}
+                            <div class="border-top pt-3 mt-auto">
+                                <div class="d-flex justify-content-between mb-3 align-items-center">
+                                    <h5 class="m-0">Total Due:</h5>
+                                    <h3 class="m-0 text-success fw-bold">${{ cart_total|floatformat:2 }}</h3>
+                                </div>
+                                <form method="GET" action="">
+                                    <button type="submit" name="clear_cart" class="btn btn-danger w-100 py-2"><i class="bi bi-trash3-fill me-1"></i> Clear Ticket</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </body>
+
+        <p style="margin-top: 20px;"><a href="{% url 'shop_home' %}" class="text-decoration-none">← Back to Main Home Hub</a></p>
+    </div>
+
+</body>
 </html>
