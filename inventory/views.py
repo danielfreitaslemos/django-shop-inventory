@@ -1,6 +1,36 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Product, SaleLog
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('shop_home')
+
+    error_message = None
+    if request.method == "POST":
+        user_in = request.POST.get('username')
+        pass_in = request.POST.get('password')
+
+        user = authenticate(request, username=user_in, password=pass_in)
+
+        if user is not None:
+            login(request, user)
+            return redirect('shop_home')
+        else:
+            error_message = "Invalid username or password. Please try again."
+
+    return render(request, 'shop/login.html', {'error_message': error_message})
+
+# LOGOUT PATHWAY VIEW
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+# HOME PATHWAY VIEW
+def shop_home(request):
+    return render(request, 'shop/home.html')
 
 
 def product_lookup(request):
@@ -26,7 +56,7 @@ def product_lookup(request):
                     product_code=product.product_code,
                     product_name=product.name,
                     quantity=1,
-                    total_price=product.price
+                    total_price=product.price,
                 )
 
                 # Copy current cart session data, modify it, and save it back
@@ -56,18 +86,16 @@ def product_lookup(request):
     }
     return render(request, "shop/lookup.html", context)
 
+
 def sales_history(request):
     # Fetch all logs, ordered by newest transaction first
-    logs = SaleLog.objects.all().order_by('-timestamp')
+    logs = SaleLog.objects.all().order_by("-timestamp")
 
     # Dynamically sum all historical store earnings!
     grand_total_revenue = sum(log.total_price for log in logs)
 
-    context = {
-        'logs': logs,
-        'grand_total': grand_total_revenue
-    }
-    return render(request, 'shop/sales_history.html', context)
+    context = {"logs": logs, "grand_total": grand_total_revenue}
+    return render(request, "shop/sales_history.html", context)
 
 
 def add_product(request):
@@ -80,10 +108,7 @@ def add_product(request):
 
         # 2. Create and save the new product ("The C in CRUD")
         Product.objects.create(
-            product_code=code,
-            name=name,
-            price=price,
-            stock_count=stock
+            product_code=code, name=name, price=price, stock_count=stock
         )
 
         # 3. Redirect back to the lookup scanner to see the new item in action
@@ -91,14 +116,15 @@ def add_product(request):
 
     return render(request, "shop/add_product.html")
 
+
 def manager_dashboard(request):
     # 1. Handle Deletion (The D in CRUD)
     # If the manager clicks delete, a POST request will pass 'delete_id'
-    if request.method == "POST" and 'delete_id' in request.POST:
-        product_id = request.POST.get('delete_id')
+    if request.method == "POST" and "delete_id" in request.POST:
+        product_id = request.POST.get("delete_id")
         product_to_delete = get_object_or_404(Product, id=product_id)
-        product_to_delete.delete() # Permanently drops the row from the database!
-        return redirect('manager_dashboard') # Refresh the page to show it's gone
+        product_to_delete.delete()  # Permanently drops the row from the database!
+        return redirect("manager_dashboard")  # Refresh the page to show it's gone
 
     # 2. Fetch all products to display on the dashboard
     all_products = Product.objects.all()
@@ -107,10 +133,11 @@ def manager_dashboard(request):
     LOW_STOCK_THRESHOLD = 5
 
     context = {
-        'products': all_products,
-        'threshold': LOW_STOCK_THRESHOLD,
+        "products": all_products,
+        "threshold": LOW_STOCK_THRESHOLD,
     }
-    return render(request, 'shop/manager_dashboard.html', context)
+    return render(request, "shop/manager_dashboard.html", context)
+
 
 # EDIT VIEW
 def edit_product(request, product_id):
@@ -119,15 +146,16 @@ def edit_product(request, product_id):
 
     if request.method == "POST":
         # Overwrite the old values with whatever the manager typed into the edit form
-        product.product_code = request.POST.get('product_code')
-        product.name = request.POST.get('name')
-        product.price = request.POST.get('price')
-        product.stock_count = request.POST.get('stock_count')
+        product.product_code = request.POST.get("product_code")
+        product.name = request.POST.get("name")
+        product.price = request.POST.get("price")
+        product.stock_count = request.POST.get("stock_count")
 
-        product.save() # <--- Saves the updated row back to SQLite
-        return redirect('manager_dashboard') # Send them back to the dashboard
+        product.save()  # <--- Saves the updated row back to SQLite
+        return redirect("manager_dashboard")  # Send them back to the dashboard
 
-    return render(request, 'shop/edit_product.html', {'product': product})
+    return render(request, "shop/edit_product.html", {"product": product})
+
 
 def shop_home(request):
-    return render(request, 'shop/home.html')
+    return render(request, "shop/home.html")

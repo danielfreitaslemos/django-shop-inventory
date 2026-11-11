@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
 import mimetypes
 from pathlib import Path
 
@@ -49,6 +48,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'inventory.middleware.ShopSecurityMiddleware',
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -118,17 +118,6 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",  # <--- Loads the user object
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "inventory.middleware.RoleValidationMiddleware",  # <--- ADD YOUR MIDDLEWARE HERE!
-]
-
 mimetypes.add_type("text/css", ".css", True)
 
 # Ensure these two lines are sitting at the absolute bottom of your settings.py:
@@ -139,8 +128,3 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     "django.contrib.staticfiles.finders.FileSystemFinder",
 ]
-
-# 4. Your custom mimetype override we added earlier
-import mimetypes
-
-mimetypes.add_type("text/css", ".css", True)

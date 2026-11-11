@@ -20,49 +20,56 @@
             <p class="text-muted fs-5">Welcome to your central control dashboard. Select a workspace portal below to begin operations.</p>
         </div>
 
-        <!-- 3-Column Workspace Matrix (Using Bootstrap 12-column grid rule) -->
+        <!-- 3-Column Workspace Matrix (Role-Aware) -->
         <div class="row g-4 justify-content-center">
 
-            <!-- PORTAL 1: CASHIER MODULE (Takes 4 of 12 columns) -->
+            <!-- PORTAL 1: CASHIER MODULE (Visible to everyone) -->
             <div class="col-md-4">
                 <div class="card h-100 shadow-sm border-0 text-center p-4">
                     <div class="text-primary mb-2" style="font-size: 2.5rem;"><i class="bi bi-cart-fill"></i></div>
-                        <h4 class="fw-bold text-dark">Cashier Register</h4>
-                        <p class="text-muted small flex-grow-1">Scan item codes, read database records, check live prices, and track current customer baskets.</p>
-                        <a href="{% url 'product_lookup' %}" class="btn btn-primary w-100 mt-3 py-2 fw-bold">Open Register</a>
-                    </div>
+                    <h4 class="fw-bold text-dark">Cashier Register</h4>
+                    <p class="text-muted small flex-grow-1">Scan item codes, read database records, check live prices, and track current customer baskets.</p>
+                    <a href="{% url 'product_lookup' %}" class="btn btn-primary w-100 mt-3 py-2 fw-bold">Open Register</a>
+                </div>
             </div>
 
-            <!-- PORTAL 2: MANAGER PANEL (Takes 4 of 12 columns) -->
-
-            <!-- Inside your home.html file, locate the Manager Panel card block and add this layout link: -->
-            <div class="card h-100 shadow-sm border-0 text-center p-4">
-                <div class="text-success mb-2" style="font-size: 2.5rem;"><i class="bi bi-graph-up-arrow"></i></div>
-                    <h4 class="fw-bold text-dark">Manager Panel</h4>
-                    <p class="text-muted small flex-grow-1">Track system stock levels, catch critical low stock alert warnings, edit details, or drop items.</p>
-                    <a href="{% url 'manager_dashboard' %}" class="btn btn-success w-100 mt-3 py-2 fw-bold">Open Dashboard</a>
-                    <a href="{% url 'sales_history' %}" class="btn btn-outline-success w-100 mt-2 py-1 small fw-bold">
-                        <i class="bi bi-receipt me-1"></i> View Sales History Logs
-                    </a>
+            <!-- MANAGER & ADMIN PORTALS (Visible ONLY to Superusers) -->
+            {% if request.user.is_superuser %}
+                <!-- PORTAL 2: MANAGER PANEL -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 text-center p-4">
+                        <div class="text-success mb-2" style="font-size: 2.5rem;"><i class="bi bi-graph-up-arrow"></i></div>
+                        <h4 class="fw-bold text-dark">Manager Panel</h4>
+                        <p class="text-muted small flex-grow-1">Track system stock levels, catch critical low stock alert warnings, edit details, or drop items.</p>
+                        <a href="{% url 'manager_dashboard' %}" class="btn btn-success w-100 mt-3 py-2 fw-bold">Open Dashboard</a>
+                        <a href="{% url 'sales_history' %}" class="btn btn-outline-success w-100 mt-2 py-1 small fw-bold">
+                            <i class="bi bi-receipt me-1"></i> View Sales History Logs
+                        </a>
+                    </div>
                 </div>
 
-            <!-- PORTAL 3: DJANGO BACK-OFFICE (Takes 4 of 12 columns) -->
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0 text-center p-4">
-                    <div class="text-secondary mb-2" style="font-size: 2.5rem;"><i class="bi bi-shield-lock-fill"></i></div>
+                <!-- PORTAL 3: DJANGO BACK-OFFICE -->
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm border-0 text-center p-4">
+                        <div class="text-secondary mb-2" style="font-size: 2.5rem;"><i class="bi bi-shield-lock-fill"></i></div>
                         <h4 class="fw-bold text-dark">Admin Database</h4>
                         <p class="text-muted small flex-grow-1">Manage underlying secure frameworks, register user authentication accounts, and clear raw tables.</p>
                         <a href="/admin/" target="_blank" class="btn btn-outline-secondary w-100 mt-3 py-2 fw-bold">Open Admin Back-office</a>
                     </div>
-            </div>
+                </div>
+            {% endif %}
 
         </div>
+
 
         <!-- Footer signature -->
         <div class="mt-5 pt-4 text-muted border-top border-2 border-white">
-            <small>System Engine Status: <span class="text-success fw-bold">● Operational</span> · Powered by Django & Arch Linux</small>
+            <small>System Engine Status: <span class="text-success fw-bold">● Operational</span> · Powered by Django & Arch Linux ·
+                Logged in as: <strong>{{ request.user.username }}</strong> ·
+                <a href="{% url 'logout' %}" class="text-danger ms-2 text-decoration-none fw-bold"><i class="bi bi-box-arrow-right"></i> Logout</a>
+            </small>
         </div>
     </div>
-
 </body>
+
 </html>

@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop OS - Secure Login</title>
+    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'inventory/css/bootstrap-icons.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center" style="min-height: 100vh;">
+
+    <div class="container" style="max-width: 450px;">
+        <div class="card border-0 shadow-sm p-4 bg-white">
+            <div class="text-center mb-4">
+                <div class="text-primary mb-2" style="font-size: 3rem;"><i class="bi bi-shield-lock-fill"></i></div>
+                <h2 class="fw-bold text-dark">Shop OS Login</h2>
+                <p class="text-muted small">Please sign in to access your operational workspace portal</p>
+            </div>
+
+            <!-- Display Authentication Error Messages -->
+            {% if error_message %}
+                <div class="alert alert-danger small py-2 border-start border-danger border-4 shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ error_message }}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted"><i class="bi bi-person-fill"></i></span>
+                        <input type="text" name="username" class="form-control" placeholder="Enter username..." required autofocus>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white text-muted"><i class="bi bi-key-fill"></i></span>
+                        <input type="password" name="password" class="form-control" placeholder="Enter password..." required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

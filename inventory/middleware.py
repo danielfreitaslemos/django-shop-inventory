@@ -1,18 +1,28 @@
-from django.http import HttpResponseForbidden
+from django.shortcuts import redirect, render
 
 
-class RoleValidationMiddleware:
+class ShopSecurityMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        # Combines lines 10 & 12 into a single statement to satisfy Zed's style rules
-        if "/manager/" in request.path and (
-            not request.user.is_authenticated or not request.user.is_staff
-        ):
-            # Explicitly define the content variable to eliminate the 'bytes' literal warning
-            html_content = "<h1>🚫 403 Access Denied</h1><p>You do not have Manager permissions to view this asset.</p>"
-            return HttpResponseForbidden(content=html_content)
+        path = request.path
 
-        response = self.get_response(request)
-        return response
+        # 1. Allow public access to login, admin, and static CSS files
+        if (
+            path.startswith("/login/")
+            or path.startswith("/admin/")
+            or path.startswith("/static/")
+        ):
+            return self.get_response(request)
+
+        # 2. Block unauthenticated users globally
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        # 3. Block non-managers from accessing any /manager/ URLs
+        if path.startswith("/manager/") and not request.user.is_superuser:
+            return render(request, "shop/403.html", status=403)
+
+        # 4. Let valid requests pass through to the views
+        return self.get_response(request)
