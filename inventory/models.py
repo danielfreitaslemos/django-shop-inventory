@@ -30,3 +30,11 @@ class SaleLog(models.Model):
 
     def __str__(self):
         return f"Sale: {self.product_name} x{self.quantity} on {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+class PixConfig(models.Model):
+    pix_key = models.CharField(max_length=100, help_text="CPF, CNPJ, Email, Phone, or Random Key")
+    merchant_name = models.CharField(max_length=25, default="SHOP OS")
+    merchant_city = models.CharField(max_length=15, default="CAMPINAS")
+
+    def __str__(self):
+        return f"Pix config: {self.merchant_name} ({self.pix_key})"

@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager - Pix Payment Settings</title>
+    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'inventory/css/bootstrap-icons.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center" style="min-height: 100vh;">
+
+    <div class="container my-5" style="max-width: 500px;">
+        <div class="card border-0 shadow-sm p-4 bg-white">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-primary m-0">Pix Payment Settings</h3>
+                <p class="text-muted small mt-1">Configure the store's receiving Pix key and owner details</p>
+            </div>
+
+            {% if saved %}
+                <div class="alert alert-success small py-2">Pix settings updated successfully!</div>
+            {% endif %}
+
+            <form method="POST" action="">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Pix Key (CPF, CNPJ, Email, Phone, or EVP)</label>
+                    <input type="text" name="pix_key" class="form-control" value="{{ config.pix_key|default:'' }}" placeholder="e.g., 12345678900 or shop@email.com" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-secondary">Receiver / Owner Name (Max 25 chars)</label>
+                    <input type="text" name="merchant_name" maxlength="25" class="form-control" value="{{ config.merchant_name|default:'SHOP OS' }}" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">City (Max 15 chars)</label>
+                    <input type="text" name="merchant_city" maxlength="15" class="form-control" value="{{ config.merchant_city|default:'CAMPINAS' }}" required>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary py-2 fw-bold">Save Pix Configuration</button>
+                    <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-secondary py-2">Back to Manager Dashboard</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

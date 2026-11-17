@@ -97,6 +97,15 @@
                         </div>
 
                         {% if cart %}
+                        {% if pix_svg %}
+                            <div class="text-center bg-light p-3 rounded mb-3 border">
+                                <p class="small fw-bold text-secondary mb-1">Scan to Pay via Pix ({{ pix_config.merchant_name }})</p>
+                                <div class="my-2">{{ pix_svg|safe }}</div>
+                                <input type="text" class="form-control form-control-sm text-center text-muted" value="{{ pix_copia_cola }}" readonly onclick="this.select();">
+                                <small class="text-muted" style="font-size: 0.75rem;">Click code above to select Copia e Cola</small>
+                            </div>
+                        {% endif %}
+
                             <div class="border-top pt-3 mt-auto">
                                 <div class="d-flex justify-content-between mb-3 align-items-center">
                                     <h5 class="m-0">Total Due:</h5>

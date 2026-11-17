@@ -11,4 +11,5 @@ urlpatterns = [
     path('mangaer/history/', views.sales_history, name='sales_history'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('manager/pix/', views.pix_settings, name='pix_settings'),
 ]

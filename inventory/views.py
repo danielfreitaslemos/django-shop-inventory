@@ -2,7 +2,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import Product, SaleLog
+from .models import PixConfig, Product, SaleLog
+from .pix_utils import generate_pix_payload, generate_pix_svg
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -79,10 +81,26 @@ def product_lookup(request):
     # Calculate cart total price dynamically
     cart_total = sum(item["price"] for item in request.session["cart"])
 
+    pix_svg = None
+    pix_copia_colaa = None
+    pix_config = PixConfig.objects.first()
+
+    if cart_total > 0 and pix_config:
+        pix_copia_colaa = generate_pix_payload(
+            pix_config.pix_key,
+            pix_config.merchant_name,
+            pix_config.merchant_city,
+            cart_total
+        )
+        pix_svg = generate_pix_svg(pix_copia_colaa)
+
     context = {
         "product": product,
         "cart": request.session["cart"],
         "cart_total": cart_total,
+        "pix_svg": pix_svg,
+        "pix_copia_cola": pix_copia_colaa,
+        "pix_config": pix_config,
     }
     return render(request, "shop/lookup.html", context)
 
@@ -159,3 +177,27 @@ def edit_product(request, product_id):
 
 def shop_home(request):
     return render(request, "shop/home.html")
+
+def pix_settings(request):
+    config = PixConfig.objects.first()
+    saved = False
+
+    if request.method == "POST":
+        pix_key = request.POST.get('pix_key')
+        merchant_name = request.POST.get('merchant_name')
+        merchant_city = request.POST.get('merchant_city')
+
+        if config:
+            config.pix_key = pix_key
+            config.merchant_name = merchant_name
+            config.merchant_city = merchant_city
+            config.save()
+        else:
+            config = PixConfig.objects.create(
+                pix_key=pix_key,
+                merchant_name=merchant_name,
+                merchant_city=merchant_city
+            )
+        saved = True
+
+    return render(request, 'shop/pix_settings.html', {'config': config, 'saved': saved})
