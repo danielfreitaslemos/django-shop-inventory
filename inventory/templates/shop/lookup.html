@@ -101,10 +101,17 @@
                             <div class="text-center bg-light p-3 rounded mb-3 border">
                                 <p class="small fw-bold text-secondary mb-1">Scan to Pay via Pix ({{ pix_config.merchant_name }})</p>
                                 <div class="my-2">{{ pix_svg|safe }}</div>
-                                <input type="text" class="form-control form-control-sm text-center text-muted" value="{{ pix_copia_cola }}" readonly onclick="this.select();">
-                                <small class="text-muted" style="font-size: 0.75rem;">Click code above to select Copia e Cola</small>
+
+                                <!-- Input group with one-click Copy button -->
+                                <div class="input-group input-group-sm mt-2">
+                                    <input type="text" id="pixCodeInput" class="form-control text-center text-muted" value="{{ pix_copia_cola }}" readonly>
+                                    <button type="button" id="copyPixBtn" class="btn btn-outline-primary fw-bold" onclick="copyPixCode()">
+                                        <i class="bi bi-clipboard me-1"></i> Copy
+                                    </button>
+                                </div>
                             </div>
                         {% endif %}
+
 
                             <div class="border-top pt-3 mt-auto">
                                 <div class="d-flex justify-content-between mb-3 align-items-center">
@@ -124,6 +131,26 @@
 
         <p style="margin-top: 20px;"><a href="{% url 'shop_home' %}" class="text-decoration-none">← Back to Main Home Hub</a></p>
     </div>
+    <script>
+        function copyPixCode() {
+            const pixInput = document.getElementById("pixCodeInput");
+            const copyBtn = document.getElementById("copyPixBtn");
 
+            // Copy the text to the system clipboard
+            navigator.clipboard.writeText(pixInput.value).then(() => {
+                // Visual feedback: turn button green and change text
+                copyBtn.classList.remove("btn-outline-primary");
+                copyBtn.classList.add("btn-success");
+                copyBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Copied!';
+
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    copyBtn.classList.remove("btn-success");
+                    copyBtn.classList.add("btn-outline-primary");
+                    copyBtn.innerHTML = '<i class="bi bi-clipboard me-1"></i> Copy';
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 </html>
