@@ -36,6 +36,22 @@
         <!-- Audit Table -->
         <div class="card border-0 shadow-sm p-4 bg-white">
             <h4 class="text-secondary mb-3">Transaction History Index</h4>
+            <!-- Search & Date Filter Bar -->
+            <form method="GET" action="" class="row g-2 mb-4">
+                <div class="col-md-6">
+                    <input type="text" name="q" class="form-control" placeholder="Search sold item name or code..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Search</button>
+                    {% if search_query or date_filter %}
+                        <a href="{% url 'sales_history' %}" class="btn btn-outline-secondary">Reset</a>
+                    {% endif %}
+                </div>
+            </form>
+
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">

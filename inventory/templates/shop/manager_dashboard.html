@@ -21,6 +21,26 @@
 
         <!-- Inventory Table Card -->
         <div class="card border-0 shadow-sm p-4 bg-white">
+            <!-- Search & Stock Filter Bar -->
+            <form method="GET" action="" class="row g-2 mb-4">
+                <div class="col-md-6">
+                    <input type="text" name="q" class="form-control" placeholder="Search by product name or barcode..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="stock" class="form-control">
+                        <option value="">All Stock Levels</option>
+                        <option value="low" {% if stock_filter == 'low' %}selected{% endif %}>Low Stock Only</option>
+                        <option value="healthy" {% if stock_filter == 'healthy' %}selected{% endif %}>Healthy Stock</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Filter</button>
+                    {% if search_query or stock_filter %}
+                        <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-secondary">Reset</a>
+                    {% endif %}
+                </div>
+            </form>
+
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">

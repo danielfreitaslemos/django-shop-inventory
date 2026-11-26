@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
+from django.db.models import Q
 
 from .models import PixConfig, Product, SaleLog
 from .pix_utils import generate_pix_payload, generate_pix_svg
@@ -114,14 +115,29 @@ def product_lookup(request):
 
 
 def sales_history(request):
-    # Fetch all logs, ordered by newest transaction first
     logs = SaleLog.objects.all().order_by("-timestamp")
 
-    # Dynamically sum all historical store earnings!
+    # Search & Date Filter Parameters
+    search_query = request.GET.get("q", "").strip()
+    date_filter = request.GET.get("date", "").strip()
+
+    if search_query:
+        logs = logs.filter(
+            Q(product_name__icontains=search_query) | Q(product_code__icontains=search_query)
+        )
+
+    if date_filter:
+        logs = logs.filter(timestamp__date=date_filter)
+
     grand_total_revenue = sum(log.total_price for log in logs)
 
-    context = {"logs": logs, "grand_total": grand_total_revenue}
-    return render(request, "shop/sales_history.html", context)
+    return render(request, "shop/sales_history.html", {
+        "logs": logs,
+        "grand_total": grand_total_revenue,
+        "search_query": search_query,
+        "date_filter": date_filter,
+    })
+
 
 
 def add_product(request):
@@ -144,25 +160,35 @@ def add_product(request):
 
 
 def manager_dashboard(request):
-    # 1. Handle Deletion (The D in CRUD)
-    # If the manager clicks delete, a POST request will pass 'delete_id'
+    threshold = 5
+
     if request.method == "POST" and "delete_id" in request.POST:
-        product_id = request.POST.get("delete_id")
-        product_to_delete = get_object_or_404(Product, id=product_id)
-        product_to_delete.delete()  # Permanently drops the row from the database!
-        return redirect("manager_dashboard")  # Refresh the page to show it's gone
+        product_to_delete = get_object_or_404(Product, id=request.POST.get("delete_id"))
+        product_to_delete.delete()
+        return redirect("manager_dashboard")
 
-    # 2. Fetch all products to display on the dashboard
-    all_products = Product.objects.all()
+    products = Product.objects.all().order_by("name")
 
-    # 3. Define what "Low Stock" means (e.g., fewer than 5 units remaining)
-    LOW_STOCK_THRESHOLD = 5
+    # Search & Filter Parameters
+    search_query = request.GET.get("q", "").strip()
+    stock_filter = request.GET.get("stock", "")
 
-    context = {
-        "products": all_products,
-        "threshold": LOW_STOCK_THRESHOLD,
-    }
-    return render(request, "shop/manager_dashboard.html", context)
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) | Q(product_code__icontains=search_query)
+        )
+
+    if stock_filter == "low":
+        products = products.filter(stock_count__lte=threshold)
+    elif stock_filter == "healthy":
+        products = products.filter(stock_count__gt=threshold)
+
+    return render(request, "shop/manager_dashboard.html", {
+        "products": products,
+        "threshold": threshold,
+        "search_query": search_query,
+        "stock_filter": stock_filter,
+    })
 
 
 # EDIT VIEW
