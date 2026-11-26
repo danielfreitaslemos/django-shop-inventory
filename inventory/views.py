@@ -117,17 +117,19 @@ def product_lookup(request):
 def sales_history(request):
     logs = SaleLog.objects.all().order_by("-timestamp")
 
-    # Search & Date Filter Parameters
     search_query = request.GET.get("q", "").strip()
     date_filter = request.GET.get("date", "").strip()
 
-    if search_query:
-        logs = logs.filter(
-            Q(product_name__icontains=search_query) | Q(product_code__icontains=search_query)
-        )
-
     if date_filter:
         logs = logs.filter(timestamp__date=date_filter)
+
+    # Full Unicode case-insensitive search
+    if search_query:
+        q_lower = search_query.casefold()
+        logs = [
+            log for log in logs
+            if q_lower in log.product_name.casefold() or q_lower in log.product_code.casefold()
+        ]
 
     grand_total_revenue = sum(log.total_price for log in logs)
 
@@ -137,6 +139,7 @@ def sales_history(request):
         "search_query": search_query,
         "date_filter": date_filter,
     })
+
 
 
 
@@ -169,19 +172,21 @@ def manager_dashboard(request):
 
     products = Product.objects.all().order_by("name")
 
-    # Search & Filter Parameters
     search_query = request.GET.get("q", "").strip()
     stock_filter = request.GET.get("stock", "")
-
-    if search_query:
-        products = products.filter(
-            Q(name__icontains=search_query) | Q(product_code__icontains=search_query)
-        )
 
     if stock_filter == "low":
         products = products.filter(stock_count__lte=threshold)
     elif stock_filter == "healthy":
         products = products.filter(stock_count__gt=threshold)
+
+    # Full Unicode case-insensitive search (handles accented letters like Café/café)
+    if search_query:
+        q_lower = search_query.casefold()
+        products = [
+            p for p in products
+            if q_lower in p.name.casefold() or q_lower in p.product_code.casefold()
+        ]
 
     return render(request, "shop/manager_dashboard.html", {
         "products": products,
@@ -189,6 +194,7 @@ def manager_dashboard(request):
         "search_query": search_query,
         "stock_filter": stock_filter,
     })
+
 
 
 # EDIT VIEW
