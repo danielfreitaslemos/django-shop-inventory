@@ -1,16 +1,8 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cashier Register Scanner</title>
+{% extends 'shop/base.html' %}
 
-    <!-- Offline style matrices -->
-    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'inventory/css/bootstrap-icons.css' %}" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% block title %}Cashier Register Scanner{% endblock %}
+
+{% block content %}
 
     <div class="container my-5">
 
@@ -136,6 +128,9 @@
 
         <p style="margin-top: 20px;"><a href="{% url 'shop_home' %}" class="text-decoration-none">← Back to Main Home Hub</a></p>
     </div>
+{% endblock %}
+
+{% block scripts %}
     <script>
         function copyPixCode() {
             const pixInput = document.getElementById("pixCodeInput");
@@ -157,5 +152,4 @@
             });
         }
     </script>
-</body>
-</html>
+{% endblock %}

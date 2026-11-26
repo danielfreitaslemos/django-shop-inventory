@@ -1,14 +1,10 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Dashboard - Edit Product</title>
-    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'inventory/css/bootstrap-icons.css' %}" rel="stylesheet">
-</head>
-<body class="bg-light d-flex align-items-center" style="min-height: 100vh;">
+{% extends 'shop/base.html' %}
+
+{% block title %}Edit Product{% endblock %}
+{% block body_class %}d-flex align-items-center{% endblock %}
+{% block body_style %}style="min-height: 100vh;"{% endblock %}
+
+{% block content %}
 
     <div class="container my-5" style="max-width: 500px;">
         <div class="card border-0 shadow-sm p-4 bg-white">
@@ -48,5 +44,4 @@
         </div>
     </div>
 
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Shop OS{% endblock %}</title>
+    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'inventory/css/bootstrap-icons.css' %}" rel="stylesheet">
+</head>
+<body class="bg-light {% block body_class %}{% endblock %}" {% block body_style %}{% endblock %}>
+
+    {% block content %}{% endblock %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

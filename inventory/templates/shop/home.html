@@ -1,16 +1,10 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏪 Shop Management System</title>
-    <!-- Pulling your bulletproof local bootstrap asset file instantly -->
-    <link href="{% static 'inventory/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'inventory/css/bootstrap-icons.css' %}" rel="stylesheet">
-    </head>
-</head>
-<body class="bg-light d-flex align-items-center" style="min-height: 100vh;">
+{% extends 'shop/base.html' %}
+
+{% block title %}Shop Management System{% endblock %}
+{% block body_class %}d-flex align-items-center{% endblock %}
+{% block body_style %}style="min-height: 100vh;"{% endblock %}
+
+{% block content %}
 
     <div class="container py-5 text-center" style="max-width: 900px;">
 
@@ -70,6 +64,6 @@
             </small>
         </div>
     </div>
-</body>
 
-</html>
+
+{% endblock %}
