@@ -12,4 +12,6 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('manager/pix/', views.pix_settings, name='pix_settings'),
+    path('manager/cashiers/', views.manage_cashiers, name='manage_cashiers'),
+    path('receipt/download', views.download_receipt, name='download_receipt'),
 ]

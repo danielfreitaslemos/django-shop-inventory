@@ -1,38 +1,46 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import PixConfig, Product, SaleLog
 from .pix_utils import generate_pix_payload, generate_pix_svg
+from io import BytesIO
+from datetime import datetime
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+
 
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('shop_home')
+        return redirect("shop_home")
 
     error_message = None
     if request.method == "POST":
-        user_in = request.POST.get('username')
-        pass_in = request.POST.get('password')
+        user_in = request.POST.get("username")
+        pass_in = request.POST.get("password")
 
         user = authenticate(request, username=user_in, password=pass_in)
 
         if user is not None:
             login(request, user)
-            return redirect('shop_home')
+            return redirect("shop_home")
         else:
             error_message = "Invalid username or password. Please try again."
 
-    return render(request, 'shop/login.html', {'error_message': error_message})
+    return render(request, "shop/login.html", {"error_message": error_message})
+
 
 # LOGOUT PATHWAY VIEW
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect("login")
+
 
 # HOME PATHWAY VIEW
 def shop_home(request):
-    return render(request, 'shop/home.html')
+    return render(request, "shop/home.html")
 
 
 def product_lookup(request):
@@ -90,7 +98,7 @@ def product_lookup(request):
             pix_config.pix_key,
             pix_config.merchant_name,
             pix_config.merchant_city,
-            cart_total
+            cart_total,
         )
         pix_svg = generate_pix_svg(pix_copia_colaa)
 
@@ -178,14 +186,15 @@ def edit_product(request, product_id):
 def shop_home(request):
     return render(request, "shop/home.html")
 
+
 def pix_settings(request):
     config = PixConfig.objects.first()
     saved = False
 
     if request.method == "POST":
-        pix_key = request.POST.get('pix_key')
-        merchant_name = request.POST.get('merchant_name')
-        merchant_city = request.POST.get('merchant_city')
+        pix_key = request.POST.get("pix_key")
+        merchant_name = request.POST.get("merchant_name")
+        merchant_city = request.POST.get("merchant_city")
 
         if config:
             config.pix_key = pix_key
@@ -196,8 +205,114 @@ def pix_settings(request):
             config = PixConfig.objects.create(
                 pix_key=pix_key,
                 merchant_name=merchant_name,
-                merchant_city=merchant_city
+                merchant_city=merchant_city,
             )
         saved = True
 
-    return render(request, 'shop/pix_settings.html', {'config': config, 'saved': saved})
+    return render(request, "shop/pix_settings.html", {"config": config, "saved": saved})
+
+def manage_cashiers(request):
+    message = None
+    error = None
+
+    if request.method == "POST":
+        # Handle deleting an existing cashier
+        if "delete_user_id" in request.POST:
+            user_id = request.POST.get("delete_user_id")
+            cashier = User.objects.filter(id=user_id, is_superuser=False).first()
+            if cashier:
+                cashier.delete()
+                message = "Cashier account removed successfully."
+
+        # Handle creating a new cashier
+        elif "create_cashier" in request.POST:
+            username = request.POST.get("username").strip()
+            password = request.POST.get("password")
+
+            if User.objects.filter(username=username).exists():
+                error = f"Username '{username}' is already taken."
+            elif len(password) < 6:
+                error = "Password must be at least 6 characters long."
+            else:
+                User.objects.create_user(username=username, password=password)
+                message = f"Cashier '{username}' created successfully!"
+
+    # Fetch only standard cashier accounts (exclude managers/superusers)
+    cashiers = User.objects.filter(is_superuser=False).order_by("-date_joined")
+
+    return render(request, "shop/manage_cashiers.html", {
+        "cashiers": cashiers,
+        "message": message,
+        "error": error
+    })
+
+
+# PDF RECEIPT
+def download_receipt(request):
+    cart = request.session.get('cart', [])
+    if not cart:
+        return redirect('product_lookup')
+
+    # Pull store name from PixConfig if available
+    pix_config = PixConfig.objects.first()
+    store_name = pix_config.merchant_name if pix_config else "SHOP OS"
+
+    # Create an in-memory PDF buffer (80mm thermal receipt width ~ 226pt)
+    buffer = BytesIO()
+    page_height = 220 + (len(cart) * 18)
+    p = canvas.Canvas(buffer, pagesize=(226, page_height))
+
+    y = page_height - 25
+
+    # Store Header
+    p.setFont("Helvetica-Bold", 12)
+    p.drawCentredString(113, y, store_name.upper())
+    y -= 15
+
+    p.setFont("Helvetica", 8)
+    p.drawCentredString(113, y, f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    y -= 12
+    p.drawCentredString(113, y, f"Cashier: {request.user.username}")
+    y -= 15
+
+    p.line(15, y, 211, y)
+    y -= 15
+
+    # Itemized List
+    p.setFont("Helvetica-Bold", 8)
+    p.drawString(15, y, "ITEM")
+    p.drawRightString(211, y, "PRICE")
+    y -= 14
+
+    p.setFont("Helvetica", 8)
+    total = 0.0
+    for item in cart:
+        name = item['name'][:22]
+        price = float(item['price'])
+        total += price
+        p.drawString(15, y, f"{name} ({item['code']})")
+        p.drawRightString(211, y, f"R$ {price:.2f}")
+        y -= 14
+
+    y -= 4
+    p.line(15, y, 211, y)
+    y -= 18
+
+    # Total Due
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(15, y, "TOTAL PAID:")
+    p.drawRightString(211, y, f"R$ {total:.2f}")
+    y -= 25
+
+    # Footer
+    p.setFont("Helvetica-Oblique", 8)
+    p.drawCentredString(113, y, "Thank you for shopping with us!")
+
+    p.showPage()
+    p.save()
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    filename = f"receipt_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
